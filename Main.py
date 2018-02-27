@@ -1,5 +1,5 @@
+import os
 import os.path
-import os 
 import time
 from shutil import copyfile
 
@@ -68,21 +68,37 @@ def create_backup(file_path):
 # change_ssh_port('sshd_config', '2510')
 # change_vsftpd_file('vsftpd.conf', '~/mydomain.com')
 
+user_name = input('Choose username:\t')
+user_password = input('Choose password for \'' + user_name + '\':\t')
+user_folder = input('Choose folder name for \'' + user_name + '\' (folder will be created if it does not exist.):\t')
 
+print('Updating system...')
 os.system("sudo apt-get update")
+
+print('Upgrading system dependencies...')
 os.system("sudo apt-get dist-upgrade")
+
+print('Installing \'vsftpd\'...')
 os.system("sudo apt-get install vsftpd")
 
-os.system("sudo useradd samuel")
-os.system("sudo passwd samuel")
-os.system("sudo chown -R samuel ~/mydomain.com")
-os.system("sudo groupadd samuel")
-os.system("sudo gpasswd -a samuel samuel")
-os.system("sudo chgrp -R samuel ~/mydomain.com")
-os.system("sudo chmod -R g+rw ~/mydomain.com")
+print('Adding user \'' + user_name + '\'...')
+os.system("sudo useradd " + user_name)
 
+print('Adding group \'' + user_name + '\'...')
+os.system("sudo groupadd " + user_name)
+
+print('Setting password for user...')
+os.system("sudo passwd " + user_password)
+
+print('Giving permissions to folders...')
+os.system("sudo chown -R " + user_name + ":" + user_name + " " + user_folder)
+os.system("sudo gpasswd -a " + user_name + " " + user_name)
+os.system("sudo chgrp -R " + user_name + " " + user_folder)
+os.system("sudo chmod -R g+rw " + user_folder)
+
+print('Restarting vsftpd services...')
 os.system("sudo systemctl restart vsftpd")
 
-os.system("sudo reboot now")
+r = input('Reboot now?(s/n)')
 
-
+os.system("sudo reboot now") if r.lower() == 's' else print('End of installation')
