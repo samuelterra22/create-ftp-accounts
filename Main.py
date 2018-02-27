@@ -129,7 +129,8 @@ print('[-] Changing vsftpd file...')
 change_vsftpd_file()
 
 print('[-] Adding user \'' + user_name + '\'...')
-os.system('sudo useradd -s /bin/false ' + user_name)
+# os.system('sudo useradd -s /bin/false ' + user_name)
+os.system('sudo useradd ' + user_name)
 
 print('[-] Setting password for user...')
 os.system('sudo passwd ' + user_name)
@@ -144,8 +145,8 @@ os.system('sudo chgrp -R ' + user_name + ' ' + user_folder)
 os.system('sudo chmod -R g+rw ' + user_folder)
 os.system('sudo usermod -d ' + user_folder + ' ' + user_name)
 
-print('[-] Restarting proftpd services...')
-os.system('sudo service proftpd restart')
+print('[-] Restarting vsftpd services...')
+os.system('sudo service vsftpd restart')
 
 print('[-] Restarting ssh services...')
 os.system('sudo service sshd restart')
