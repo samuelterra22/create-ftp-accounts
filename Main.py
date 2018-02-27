@@ -38,6 +38,28 @@ def change_vsftpd_file(vsftpd_conf_path='/etc/vsftpd.conf'):
     open(vsftpd_conf_path, 'w').write(saida)
 
 
+def change_proftpd_file(proftpd_conf_path='/etc/proftpd/proftpd.conf', group=''):
+    # cria backup do arquivo
+    create_backup(proftpd_conf_path)
+
+    file = open(proftpd_conf_path, 'r')
+    saida = ''
+    for line in file:
+        if 'DefaultRoot' in line and '~' in line:
+            saida += 'DefaultRoot                     ~ ' + group + ', !staff'
+
+        else:
+            saida += line
+
+    file.close()
+
+    # apaga o arquivo antigo
+    os.remove(proftpd_conf_path)
+
+    # escreve o novo de acordo com as modificacoes
+    open(proftpd_conf_path, 'w').write(saida)
+
+
 def change_ssh_port(path='/etc/ssh/sshd_config', port='2510'):
     # cria backup do arquivo
     create_backup(path)
@@ -65,17 +87,19 @@ def create_backup(file_path):
     copyfile(file_path, backup)
 
 
+FTP_GROUP = 'ftpaccess'
+
 user_name = input('[?] Choose username:\t')
-user_password = input('[?] Choose password for \'' + user_name + '\':\t')
-user_folder = input('[?] Choose folder name for \'' + user_name + '\' (folder will be created if it does not exist.):\t')
+user_folder = input(
+    '[?] Choose folder name for \'' + user_name + '\' (folder will be created if it does not exist.):\t')
 ssh_port = input('[?] Choose ssh port:\t')
 
 print('[!] Summary:')
 print('\t[>] Username:' + user_name)
-print('\t[>] User password:' + user_password)
+print('\t[>] User password: You will choose.')
 print('\t[>] User folder:' + user_folder)
 print('\t[>] SSH Port:' + ssh_port)
-print('\t[>] \'vsftpd\' will be installed.')
+print('\t[>] \'proftpd\' will be installed.')
 
 c = input('Continue? (s/n)')
 
@@ -93,17 +117,18 @@ os.system("sudo apt-get -y install vsftpd")
 print('[-] Changing ssh port...')
 change_ssh_port(port=str(ssh_port))
 
-print('[-] Changing vsftpd file...')
-change_vsftpd_file()
+print('[-] Changing proftpd file...')
+change_proftpd_file(group=FTP_GROUP)
+
+print('[-] Adding group ' + FTP_GROUP + ' if exists...')
+os.system('getent group ' + FTP_GROUP + ' || groupadd ' + FTP_GROUP + '')
 
 print('[-] Adding user \'' + user_name + '\'...')
-os.system("sudo useradd -r -s /bin/false " + user_name)
-
-print('[-] Adding group \'' + user_name + '\'...')
-os.system("sudo groupadd " + user_name)
+print('[-] Adding user \'' + user_name + '\' to group ' + FTP_GROUP + '...')
+os.system('sudo useradd -G ' + FTP_GROUP + ' -s /bin/false ' + user_name)
 
 print('[-] Setting password for user...')
-os.system("sudo passwd " + user_password)
+os.system("sudo passwd " + user_name)
 
 print('[-] Creating user folder...')
 os.system("sudo mkdir -p " + user_folder)
@@ -115,8 +140,8 @@ os.system("sudo chgrp -R " + user_name + " " + user_folder)
 os.system("sudo chmod -R g+rw " + user_folder)
 os.system("sudo usermod -d " + user_folder + " " + user_name)
 
-print('[-] Restarting vsftpd services...')
-os.system("sudo systemctl restart vsftpd")
+print('[-] Restarting proftpd services...')
+os.system("sudo service proftpd restart")
 
 print('[-] Restarting ssh services...')
 os.system("sudo service sshd restart")
