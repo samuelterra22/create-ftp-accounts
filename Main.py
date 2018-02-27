@@ -82,7 +82,7 @@ def change_ssh_port(path='/etc/ssh/sshd_config', port='2510'):
 
 
 def create_backup(file_path):
-    backup_pattern = '-' + str(time.strftime("%X"))
+    backup_pattern = '-' + str(time.strftime('%X'))
     backup = file_path + backup_pattern
     copyfile(file_path, backup)
 
@@ -106,15 +106,15 @@ c = input('Continue? (s/n)')
 exit(-1) if c.lower() == 'n' else print('Continuing installation!')
 
 print('[-] Updating system...')
-os.system("sudo apt-get update")
+os.system('sudo apt-get update')
 
 print('[-] Upgrading system dependencies...')
-os.system("sudo apt-get -y dist-upgrade")
-os.system("sudo apt-get -y autoremove")
-os.system("sudo apt-get -y autoclean")
+os.system('sudo apt-get -y dist-upgrade')
+os.system('sudo apt-get -y autoremove')
+os.system('sudo apt-get -y autoclean')
 
 print('[-] Installing \'proftpd\'...')
-os.system("sudo apt-get -y install proftpd")
+os.system('sudo apt-get -y install proftpd')
 
 print('[-] Changing ssh port...')
 change_ssh_port(port=str(ssh_port))
@@ -122,7 +122,7 @@ change_ssh_port(port=str(ssh_port))
 print('[-] Changing proftpd file...')
 change_proftpd_file(group=FTP_GROUP)
 
-print('[-] Adding group ' + FTP_GROUP + ' if exists...')
+print('[-] Creating group ' + FTP_GROUP + ' if exists...')
 os.system('getent group ' + FTP_GROUP + ' || groupadd ' + FTP_GROUP + '')
 
 print('[-] Adding user \'' + user_name + '\'...')
@@ -130,24 +130,24 @@ print('[-] Adding user \'' + user_name + '\' to group ' + FTP_GROUP + '...')
 os.system('sudo useradd -G ' + FTP_GROUP + ' -s /bin/false ' + user_name)
 
 print('[-] Setting password for user...')
-os.system("sudo passwd " + user_name)
+os.system('sudo passwd ' + user_name)
 
 print('[-] Creating user folder...')
-os.system("sudo mkdir -p " + user_folder)
+os.system('sudo mkdir -p ' + user_folder)
 
 print('[-] Giving permissions to folders...')
-os.system("sudo chown -R " + user_name + ":" + user_name + " " + user_folder)
-os.system("sudo gpasswd -a " + user_name + " " + user_name)
-os.system("sudo chgrp -R " + user_name + " " + user_folder)
-os.system("sudo chmod -R g+rw " + user_folder)
-os.system("sudo usermod -d " + user_folder + " " + user_name)
+os.system('sudo chown -R ' + user_name + ':' + user_name + ' ' + user_folder)
+os.system('sudo gpasswd -a ' + user_name + ' ' + user_name)
+os.system('sudo chgrp -R ' + user_name + ' ' + user_folder)
+os.system('sudo chmod -R g+rw ' + user_folder)
+os.system('sudo usermod -d ' + user_folder + ' ' + user_name)
 
 print('[-] Restarting proftpd services...')
-os.system("sudo service proftpd restart")
+os.system('sudo service proftpd restart')
 
 print('[-] Restarting ssh services...')
-os.system("sudo service sshd restart")
+os.system('sudo service sshd restart')
 
 r = input('Reboot now?(s/n)')
 
-os.system("sudo reboot now") if r.lower() == 's' else print('End of installation')
+os.system('sudo reboot now') if r.lower() == 's' else print('End of installation')
