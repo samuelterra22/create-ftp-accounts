@@ -65,39 +65,60 @@ def create_backup(file_path):
     copyfile(file_path, backup)
 
 
-# change_ssh_port('sshd_config', '2510')
-# change_vsftpd_file('vsftpd.conf', '~/mydomain.com')
+user_name = input('[?] Choose username:\t')
+user_password = input('[?] Choose password for \'' + user_name + '\':\t')
+user_folder = input('[?] Choose folder name for \'' + user_name + '\' (folder will be created if it does not exist.):\t')
+ssh_port = input('[?] Choose ssh port:\t')
 
-user_name = input('Choose username:\t')
-user_password = input('Choose password for \'' + user_name + '\':\t')
-user_folder = input('Choose folder name for \'' + user_name + '\' (folder will be created if it does not exist.):\t')
+print('[!] Summary:')
+print('\t[>] Username:' + user_name)
+print('\t[>] User password:' + user_password)
+print('\t[>] User folder:' + user_folder)
+print('\t[>] SSH Port:' + ssh_port)
+print('\t[>] \'vsftpd\' will be installed.')
 
-print('Updating system...')
+c = input('Continue? (s/n)')
+
+exit(-1) if c.lower() == 'n' else print('Continuing installation!')
+
+print('[-] Updating system...')
 os.system("sudo apt-get update")
 
-print('Upgrading system dependencies...')
-os.system("sudo apt-get dist-upgrade")
+print('[-] Upgrading system dependencies...')
+os.system("sudo apt-get -y dist-upgrade")
 
-print('Installing \'vsftpd\'...')
-os.system("sudo apt-get install vsftpd")
+print('[-] Installing \'vsftpd\'...')
+os.system("sudo apt-get -y install vsftpd")
 
-print('Adding user \'' + user_name + '\'...')
+print('[-] Changing ssh port...')
+change_ssh_port(port=str(ssh_port))
+
+print('[-] Changing vsftpd file...')
+change_vsftpd_file()
+
+print('[-] Adding user \'' + user_name + '\'...')
 os.system("sudo useradd " + user_name)
 
-print('Adding group \'' + user_name + '\'...')
+print('[-] Adding group \'' + user_name + '\'...')
 os.system("sudo groupadd " + user_name)
 
-print('Setting password for user...')
+print('[-] Setting password for user...')
 os.system("sudo passwd " + user_password)
 
-print('Giving permissions to folders...')
+print('[-] Creating user folder...')
+os.system("sudo mkdir -p " + user_folder)
+
+print('[-] Giving permissions to folders...')
 os.system("sudo chown -R " + user_name + ":" + user_name + " " + user_folder)
 os.system("sudo gpasswd -a " + user_name + " " + user_name)
 os.system("sudo chgrp -R " + user_name + " " + user_folder)
 os.system("sudo chmod -R g+rw " + user_folder)
 
-print('Restarting vsftpd services...')
+print('[-] Restarting vsftpd services...')
 os.system("sudo systemctl restart vsftpd")
+
+print('[-] Restarting ssh services...')
+os.system("sudo service sshd restart")
 
 r = input('Reboot now?(s/n)')
 
