@@ -69,4 +69,20 @@ def create_backup(file_path):
 # change_vsftpd_file('vsftpd.conf', '~/mydomain.com')
 
 
-os.system("passwd bruno")
+os.system("sudo apt-get update")
+os.system("sudo apt-get dist-upgrade")
+os.system("sudo apt-get install vsftpd")
+
+os.system("sudo useradd samuel")
+os.system("sudo passwd samuel")
+os.system("sudo chown -R samuel ~/mydomain.com")
+os.system("sudo groupadd samuel")
+os.system("sudo gpasswd -a samuel samuel")
+os.system("sudo chgrp -R samuel ~/mydomain.com")
+os.system("sudo chmod -R g+rw ~/mydomain.com")
+
+os.system("sudo systemctl restart vsftpd")
+
+os.system("sudo reboot now")
+
+
