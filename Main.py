@@ -97,7 +97,7 @@ print('[-] Changing vsftpd file...')
 change_vsftpd_file()
 
 print('[-] Adding user \'' + user_name + '\'...')
-os.system("sudo useradd " + user_name)
+os.system("sudo useradd -r -s /bin/false " + user_name)
 
 print('[-] Adding group \'' + user_name + '\'...')
 os.system("sudo groupadd " + user_name)
@@ -113,6 +113,7 @@ os.system("sudo chown -R " + user_name + ":" + user_name + " " + user_folder)
 os.system("sudo gpasswd -a " + user_name + " " + user_name)
 os.system("sudo chgrp -R " + user_name + " " + user_folder)
 os.system("sudo chmod -R g+rw " + user_folder)
+os.system("sudo usermod -d " + user_folder + " " + user_name)
 
 print('[-] Restarting vsftpd services...')
 os.system("sudo systemctl restart vsftpd")
