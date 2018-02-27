@@ -99,11 +99,11 @@ print('\t[>] Username:' + user_name)
 print('\t[>] User password: You will choose.')
 print('\t[>] User folder:' + user_folder)
 print('\t[>] SSH Port:' + ssh_port)
-print('\t[>] \'proftpd\' will be installed.')
+print('\t[>] \'vsftpd\' will be installed.')
 
 c = input('Continue? (y/n)')
 
-exit(-1) if c.lower() == 'n' else print('Continuing installation!')
+exit(-1) if c.lower() == 'n' else print('[-] Continuing installation!')
 
 print('[-] Updating system...')
 os.system('sudo apt-get update')
