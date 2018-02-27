@@ -101,7 +101,7 @@ print('\t[>] User folder:' + user_folder)
 print('\t[>] SSH Port:' + ssh_port)
 print('\t[>] \'proftpd\' will be installed.')
 
-c = input('Continue? (s/n)')
+c = input('Continue? (y/n)')
 
 exit(-1) if c.lower() == 'n' else print('Continuing installation!')
 
@@ -136,10 +136,10 @@ print('[-] Creating user folder...')
 os.system('sudo mkdir -p ' + user_folder)
 
 print('[-] Giving permissions to folders...')
-os.system('sudo chown -R ' + user_name + ':' + user_name + ' ' + user_folder)
-os.system('sudo gpasswd -a ' + user_name + ' ' + user_name)
-os.system('sudo chgrp -R ' + user_name + ' ' + user_folder)
-os.system('sudo chmod -R g+rw ' + user_folder)
+# os.system('sudo chown -R ' + user_name + ':' + user_name + ' ' + user_folder)
+# os.system('sudo gpasswd -a ' + user_name + ' ' + user_name)
+# os.system('sudo chgrp -R ' + user_name + ' ' + user_folder)
+# os.system('sudo chmod -R g+rw ' + user_folder)
 os.system('sudo usermod -d ' + user_folder + ' ' + user_name)
 
 print('[-] Restarting proftpd services...')
@@ -148,6 +148,6 @@ os.system('sudo service proftpd restart')
 print('[-] Restarting ssh services...')
 os.system('sudo service sshd restart')
 
-r = input('Reboot now?(s/n)')
+r = input('Reboot now?(y/n)')
 
 os.system('sudo reboot now') if r.lower() == 's' else print('End of installation')
