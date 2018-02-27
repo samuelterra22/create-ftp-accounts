@@ -110,9 +110,11 @@ os.system("sudo apt-get update")
 
 print('[-] Upgrading system dependencies...')
 os.system("sudo apt-get -y dist-upgrade")
+os.system("sudo apt-get -y autoremove")
+os.system("sudo apt-get -y autoclean")
 
-print('[-] Installing \'vsftpd\'...')
-os.system("sudo apt-get -y install vsftpd")
+print('[-] Installing \'proftpd\'...')
+os.system("sudo apt-get -y install proftpd")
 
 print('[-] Changing ssh port...')
 change_ssh_port(port=str(ssh_port))
