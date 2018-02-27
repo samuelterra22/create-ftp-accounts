@@ -87,7 +87,7 @@ def create_backup(file_path):
     copyfile(file_path, backup)
 
 
-FTP_GROUP = 'ftpaccess'
+# FTP_GROUP = 'ftpaccess'
 
 user_name = input('[?] Choose username:\t')
 user_folder = input(
@@ -113,28 +113,36 @@ os.system('sudo apt-get -y dist-upgrade')
 os.system('sudo apt-get -y autoremove')
 os.system('sudo apt-get -y autoclean')
 
-print('[-] Installing \'proftpd\'...')
-os.system('sudo apt-get -y install proftpd')
+# print('[-] Installing \'proftpd\'...')
+# os.system('sudo apt-get -y install proftpd')
+
+print('[-] Installing \'vsftpd\'...')
+os.system('sudo apt-get -y install vsftpd')
 
 print('[-] Changing ssh port...')
 change_ssh_port(port=str(ssh_port))
 
-print('[-] Changing proftpd file...')
+# print('[-] Changing proftpd file...')
 # change_proftpd_file(group=FTP_GROUP)
 
-# print('[-] Creating group ' + FTP_GROUP + ' if exists...')
-# os.system('getent group ' + FTP_GROUP + ' || groupadd ' + FTP_GROUP + '')
+print('[-] Changing vsftpd file...')
+change_vsftpd_file()
 
 print('[-] Adding user \'' + user_name + '\'...')
-# print('[-] Adding user \'' + user_name + '\' to group ' + FTP_GROUP + '...')
 os.system('sudo useradd -s /bin/false ' + user_name)
-os.system('sudo usermod -d ' + user_folder + ' ' + user_name)
 
 print('[-] Setting password for user...')
 os.system('sudo passwd ' + user_name)
 
 print('[-] Creating user folder...')
 os.system('sudo mkdir -p ' + user_folder)
+
+print('[-] Giving permissions to folders...')
+os.system('sudo chown -R ' + user_name + ':' + user_name + ' ' + user_folder)
+os.system('sudo gpasswd -a ' + user_name + ' ' + user_name)
+os.system('sudo chgrp -R ' + user_name + ' ' + user_folder)
+os.system('sudo chmod -R g+rw ' + user_folder)
+os.system('sudo usermod -d ' + user_folder + ' ' + user_name)
 
 print('[-] Restarting proftpd services...')
 os.system('sudo service proftpd restart')
